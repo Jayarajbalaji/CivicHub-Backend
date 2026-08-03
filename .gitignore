@@ -13,11 +13,9 @@ venv/
 
 # Model files (optional)
 *.h5
-*.pt
 *.pth
 
 # Uploads
 uploads/
-.vscode/
 # Logs
 *.log
