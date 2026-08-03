@@ -4,10 +4,15 @@ from app.routes.predict import router
 
 app = FastAPI(title="CivicAI Backend")
 
-# CORS
+# Allowed Frontend URLs
+origins = [
+    "http://localhost:5173",
+    "https://civic-hub-weld.vercel.app",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,4 +24,6 @@ app.include_router(router)
 # Home Route
 @app.get("/")
 def home():
-    return {"message": "CivicAI Backend Running"}
+    return {
+        "message": "CivicAI Backend Running"
+    }
