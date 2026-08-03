@@ -1,6 +1,8 @@
 from ultralytics import YOLO
+import time
 
-# Load all trained models
+print("Loading AI Models...")
+
 road_model = YOLO("app/ai/models/road_damage.pt")
 garbage_model = YOLO("app/ai/models/garbage.pt")
 street_model = YOLO("app/ai/models/street_light.pt")
@@ -8,38 +10,37 @@ water_model = YOLO("app/ai/models/water_leakage.pt")
 tree_model = YOLO("app/ai/models/tree_fallen.pt")
 drainage_model = YOLO("app/ai/models/drainage.pt")
 
+print("All AI Models Loaded Successfully")
 
-def predict(image_path):
 
-    models = [
-        ("Road Damage", road_model),
-        ("Garbage", garbage_model),
-        ("Street Light", street_model),
-        ("Water Leakage", water_model),
-        ("Tree Fallen", tree_model),
-        ("Drainage", drainage_model),
-    ]
+MODEL_MAP = {
+    "Road Damage": road_model,
+    "Garbage": garbage_model,
+    "Street Light": street_model,
+    "Water Leakage": water_model,
+    "Tree Fallen": tree_model,
+    "Drainage": drainage_model,
+}
 
-    best = None
-    best_conf = 0.0
 
-    for category, model in models:
+DEPARTMENT_MAP = {
+    "Road Damage": "Road Department",
+    "Garbage": "Sanitation Department",
+    "Street Light": "Electricity Department",
+    "Water Leakage": "Water Supply Department",
+    "Tree Fallen": "Parks Department",
+    "Drainage": "Public Works Department",
+}
 
-        results = model.predict(image_path, verbose=False)
 
-        boxes = results[0].boxes
+def predict(image_path, category):
 
-        if len(boxes) == 0:
-            continue
+    print("================================")
+    print("Selected Category :", category)
 
-        confidence = float(boxes.conf.max())
+    model = MODEL_MAP.get(category)
 
-        if confidence > best_conf:
-            best_conf = confidence
-            best = category
-
-    # No issue detected
-    if best is None:
+    if model is None:
         return {
             "category": "Unknown",
             "confidence": 0,
@@ -47,27 +48,46 @@ def predict(image_path):
             "severity": "Low",
         }
 
-    # Department mapping
-    department_map = {
-        "Road Damage": "Road Department",
-        "Garbage": "Sanitation Department",
-        "Street Light": "Electricity Department",
-        "Water Leakage": "Water Supply Department",
-        "Tree Fallen": "Parks Department",
-        "Drainage": "Public Works Department",
-    }
+    start = time.time()
 
-    # Severity mapping
-    if best_conf >= 0.80:
+    results = model.predict(
+        source=image_path,
+        verbose=False,
+        conf=0.25,
+        imgsz=640,
+    )
+
+    end = time.time()
+
+    print(f"Inference Time : {round(end-start,2)} sec")
+
+    if len(results) == 0 or results[0].boxes is None or len(results[0].boxes) == 0:
+
+        print("No Detection")
+
+        return {
+            "category": category,
+            "confidence": 0,
+            "department": DEPARTMENT_MAP.get(category),
+            "severity": "Low",
+        }
+
+    confidence = float(results[0].boxes.conf.max())
+
+    if confidence >= 0.80:
         severity = "High"
-    elif best_conf >= 0.50:
+    elif confidence >= 0.50:
         severity = "Medium"
     else:
         severity = "Low"
 
-    return {
-        "category": best,
-        "confidence": round(best_conf * 100, 2),
-        "department": department_map.get(best, "General Department"),
+    response = {
+        "category": category,
+        "confidence": round(confidence * 100, 2),
+        "department": DEPARTMENT_MAP.get(category),
         "severity": severity,
     }
+
+    print(response)
+
+    return response
