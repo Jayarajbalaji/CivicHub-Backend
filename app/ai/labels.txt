@@ -1,0 +1,6 @@
+Road_Damage
+Garbage
+Street_Light
+Water_Leakage
+Tree_Fallen
+Drainage

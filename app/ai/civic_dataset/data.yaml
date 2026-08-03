@@ -1,0 +1,13 @@
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 6
+
+names:
+  0: Road_Damage
+  1: Garbage
+  2: Street_Light
+  3: Water_Leakage
+  4: Tree_Fallen
+  5: Drainage

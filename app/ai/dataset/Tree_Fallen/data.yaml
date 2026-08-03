@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['fallen_tree']
+
+roboflow:
+  workspace: hazard-detection-kzrtt
+  project: fallen-tree-e4f2f
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/hazard-detection-kzrtt/fallen-tree-e4f2f/dataset/3

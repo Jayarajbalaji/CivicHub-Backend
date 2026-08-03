@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['Garbage']
+
+roboflow:
+  workspace: agx-iyj2m
+  project: garbage-0q3db
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/agx-iyj2m/garbage-0q3db/dataset/2

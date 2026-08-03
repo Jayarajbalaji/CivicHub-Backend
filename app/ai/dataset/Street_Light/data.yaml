@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 9
+names: ['Light-pole', 'Street light', 'Street_Light', 'Street_light', 'off', 'off street light', 'on street light', 'street light', 'street_light_0']
+
+roboflow:
+  workspace: datasets-cobjh
+  project: street-light-off
+  version: 16
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/datasets-cobjh/street-light-off/dataset/16

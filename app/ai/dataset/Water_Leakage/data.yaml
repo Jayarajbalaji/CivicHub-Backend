@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['leak']
+
+roboflow:
+  workspace: jyothikas-workspace-mfhf8
+  project: leakage-inspection
+  version: 2
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/jyothikas-workspace-mfhf8/leakage-inspection/dataset/2
