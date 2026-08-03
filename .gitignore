@@ -17,5 +17,10 @@ venv/
 
 # Uploads
 uploads/
+
 # Logs
 *.log
+
+# YOLO
+runs/
+yolov8n.pt
