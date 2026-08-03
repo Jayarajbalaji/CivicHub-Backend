@@ -31,63 +31,83 @@ DEPARTMENT_MAP = {
     "Tree Fallen": "Parks Department",
     "Drainage": "Public Works Department",
 }
-
-
 def predict(image_path, category):
+    try:
+        print("================================")
+        print("Selected Category:", category)
 
-    print("================================")
-    print("Selected Category :", category)
+        model = MODEL_MAP.get(category)
 
-    model = MODEL_MAP.get(category)
+        if model is None:
+            return {
+                "category": "Unknown",
+                "confidence": 0,
+                "department": "General Department",
+                "severity": "Low",
+            }
 
-    if model is None:
-        return {
-            "category": "Unknown",
-            "confidence": 0,
-            "department": "General Department",
-            "severity": "Low",
-        }
+        print("Running model...")
 
-    start = time.time()
+        start = time.time()
 
-    results = model.predict(
-        source=image_path,
-        verbose=False,
-        conf=0.25,
-        imgsz=640,
-    )
+        results = model.predict(
+            source=image_path,
+            verbose=False,
+            conf=0.25,
+            imgsz=640,
+        )
 
-    end = time.time()
+        end = time.time()
 
-    print(f"Inference Time : {round(end-start,2)} sec")
+        print(f"Inference Time: {round(end-start,2)} sec")
 
-    if len(results) == 0 or results[0].boxes is None or len(results[0].boxes) == 0:
+        if len(results) == 0:
+            print("No results")
+            return {
+                "category": category,
+                "confidence": 0,
+                "department": DEPARTMENT_MAP.get(category),
+                "severity": "Low",
+            }
 
-        print("No Detection")
+        if results[0].boxes is None or len(results[0].boxes) == 0:
+            print("No boxes detected")
+            return {
+                "category": category,
+                "confidence": 0,
+                "department": DEPARTMENT_MAP.get(category),
+                "severity": "Low",
+            }
+
+        confidence = float(results[0].boxes.conf.max())
+
+        print("Confidence:", confidence)
+
+        if confidence >= 0.80:
+            severity = "High"
+        elif confidence >= 0.50:
+            severity = "Medium"
+        else:
+            severity = "Low"
 
         return {
             "category": category,
-            "confidence": 0,
+            "confidence": round(confidence * 100, 2),
             "department": DEPARTMENT_MAP.get(category),
-            "severity": "Low",
+            "severity": severity,
         }
 
-    confidence = float(results[0].boxes.conf.max())
+    except Exception as e:
+        import traceback
 
-    if confidence >= 0.80:
-        severity = "High"
-    elif confidence >= 0.50:
-        severity = "Medium"
-    else:
-        severity = "Low"
+        print("========== AI ERROR ==========")
+        traceback.print_exc()
 
-    response = {
-        "category": category,
-        "confidence": round(confidence * 100, 2),
-        "department": DEPARTMENT_MAP.get(category),
-        "severity": severity,
-    }
+        return {
+            "category": "Error",
+            "confidence": 0,
+            "department": "General Department",
+            "severity": "Low",
+            "error": str(e),
+        }
 
-    print(response)
-
-    return response
