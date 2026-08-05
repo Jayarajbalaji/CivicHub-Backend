@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File
 import os
 import shutil
 
@@ -11,13 +11,10 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 @router.post("/predict")
-async def predict_issue(
-    file: UploadFile = File(...),
-    category: str = Form(...)
-):
+async def predict_issue(file: UploadFile = File(...)):
+
     print("===================================")
     print("Prediction Request Received")
-    print("Category:", category)
 
     ext = os.path.splitext(file.filename)[1]
 
@@ -30,11 +27,11 @@ async def predict_issue(
         shutil.copyfileobj(file.file, buffer)
 
     print("Image Saved:", filepath)
-
     print("Calling AI...")
 
-    result = predict(filepath, category)
+    result = predict(filepath)
 
     print("AI Finished")
+    print(result)
 
     return result
